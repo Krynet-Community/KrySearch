@@ -1,6 +1,7 @@
 "use strict";
 
-import { KrySecurityRouter } from './Modules/security-router.js';
+// Import directly from the production GitHub repository file path
+import { KrySecurityRouter } from 'https://raw.githubusercontent.com/Krynet-LLC/KrySearch/refs/heads/main/UI/Modules/security-router.js';
 
 (async () => {
   const p = new URLSearchParams(location.search);
@@ -34,12 +35,13 @@ import { KrySecurityRouter } from './Modules/security-router.js';
   // 🔧 Load config
   let CONFIG;
   try {
-    const res = await fetch("./Config/config.json", { cache: "no-store" });
+    // Relative back up pathing if search.js runs inside the UI directory context
+    const res = await fetch("../Config/config.json", { cache: "no-store" });
     if (!res.ok) throw new Error(res.status);
     CONFIG = await res.json();
   } catch (e) { return console.error("[KrySearch] Failed to load config.json", e) }
 
-  // 🔍 Determine engine (Updated to match your flat engines structure in config.json)
+  // 🔍 Determine engine (Matches flat engine configurations)
   const engines = CONFIG.engines || {};
   const engineKey = (forcedEngine && engines[forcedEngine]) ? forcedEngine : CONFIG.search.defaultEngine;
   const engine = engines[engineKey];
