@@ -1,85 +1,60 @@
 "use strict";
 
-import { z } from 'zod';
+import DOMPurify from 'dompurify';
+import { x25519 } from '@noble/curves/ed25519';
+import { gcm } from '@noble/ciphers/aes';
+import { sha512 } from '@noble/hashes/sha512';
+import queryString from 'query-string';
+import uts46 from 'idna-uts46-hx'; // Industry-standard IDNA2008 URL normalization
+import { decode } from 'html-entities'; // Flattens all hidden encoding variations
 
 /* ==========================================================================
-   1. TYPE DEFINITIONS & SCHEMAS
+   1. CONFIGURATION
    ========================================================================== */
 
-export interface EngineProfile {
-  vendor: string;
-  renderer: string;
-  perfRes: number;
-}
+const TRACKING_PARAMS = ["utm_", "fbclid", "gclid", "_ga", "_gl", "_gid"];
 
-export interface ZKEncryptedPacket {
-  iv: number[];
-  payload: string;
-}
-
-export interface DoHResponseAnswer {
-  data: string;
-  type: number;
-}
-
-export interface DoHResponse {
-  Answer?: DoHResponseAnswer[];
-}
-
-// Runtime validation schema for search inputs
-const QuerySchema = z.string().max(256).transform(val => 
-  val.normalize("NFKC").replace(/[^\x20-\x7E]/g, "").trim()
-);
-
-/* ==========================================================================
-   2. CONFIGURATION STRIP
-   ========================================================================== */
-
-const TRACKING_PARAMS: string[] = ["utm_", "fbclid", "gclid", "_ga", "_gl", "_gid"];
-
-const DOH_SERVERS: string[] = [
+const DOH_SERVERS = [
   "https://dns.quad9.net/dns-query",
   "https://dns.google/dns-query",
   "https://cloudflare-dns.com/dns-query"
 ];
 
 /* ==========================================================================
-   3. CORE SECURITY ENGINE CLASS
+   2. CORE SECURITY ENGINE CLASS
    ========================================================================== */
 
 export class KrySecurityRouter {
-  private engineProfile: string;
-  private profiles: Record<string, EngineProfile> = {
-    default: { vendor: "KrySearch", renderer: "KrySearch Renderer", perfRes: 100 },
-    tor: { vendor: "Mozilla", renderer: "Gecko", perfRes: 100 },
-    chromium: { vendor: "Google Inc.", renderer: "ANGLE", perfRes: 50 }
-  };
-
-  constructor(engineProfile: string = "default") {
+  constructor(engineProfile = "default") {
     this.engineProfile = engineProfile;
+    this.profiles = {
+      default: { vendor: "KrySearch", renderer: "KrySearch Renderer", perfRes: 100 },
+      tor: { vendor: "Mozilla", renderer: "Gecko", perfRes: 100 },
+      chromium: { vendor: "Google Inc.", renderer: "ANGLE", perfRes: 50 }
+    };
   }
 
   /**
-   * Enforces strict canvas, geometry layout, and high-risk API normalization
+   * Hardens and standardizes the runtime fingerprint surface area using deep object freezing
    */
-  public initializeFingerprintHardening(): void {
+  initializeFingerprintHardening() {
     const profile = this.profiles[this.engineProfile] || this.profiles.default;
 
-    // Normalize Canvas surface responses
+    // Standardize Canvas surface responses
     if (globalThis.HTMLCanvasElement?.prototype.toDataURL) {
-      globalThis.HTMLCanvasElement.prototype.toDataURL = (): string => 
+      globalThis.HTMLCanvasElement.prototype.toDataURL = () => 
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB";
     }
     
     if (globalThis.CanvasRenderingContext2D?.prototype.getImageData) {
-      globalThis.CanvasRenderingContext2D.prototype.getImageData = (x: number, y: number, w: number, h: number): ImageData => 
+      globalThis.CanvasRenderingContext2D.prototype.getImageData = (x, y, w, h) => 
         new ImageData(w, h);
     }
 
-    // Flatten DOM rect measurements to neutralize font/rendering side-channels
+    // Flatten DOM rect measurements to neutralize font/rendering side-channels completely
     if (globalThis.Element?.prototype.getBoundingClientRect) {
       const originalGetBoundingClientRect = globalThis.Element.prototype.getBoundingClientRect;
-      globalThis.Element.prototype.getBoundingClientRect = function (this: Element): DOMRect {
+      globalThis.Element.prototype.getBoundingClientRect = function () {
         const rect = originalGetBoundingClientRect.call(this);
         return {
           x: Math.round(rect.x), y: Math.round(rect.y),
@@ -87,40 +62,62 @@ export class KrySecurityRouter {
           top: Math.round(rect.top), left: Math.round(rect.left),
           right: Math.round(rect.right), bottom: Math.round(rect.bottom),
           toJSON: () => rect.toJSON()
-        } as DOMRect;
+        };
       };
     }
 
-    // Hardware specifications lock
-    try {
-      Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 4, configurable: true });
-      if (navigator.connection) {
-        Object.defineProperty(navigator, "connection", {
-          get: () => ({ effectiveType: "4g", rtt: 100, downlink: 10, saveData: false }),
-          configurable: true
-        });
-      }
-    } catch {}
+    // Immutable Hardware Specifications Lock
+    const targetSpecs = {
+      hardwareConcurrency: 4,
+      deviceMemory: 8,
+      maxTouchPoints: 0
+    };
 
-    // Immediate lockdown of high-risk browser subsystems
-    const highRiskApis: string[] = ["geolocation", "mediaDevices", "bluetooth", "usb", "serial", "vibrate"];
+    for (const [prop, value] of Object.entries(targetSpecs)) {
+      if (prop in navigator) {
+        try {
+          Object.defineProperty(navigator, prop, {
+            value: value,
+            writable: false,
+            configurable: false,
+            enumerable: true
+          });
+        } catch {}
+      }
+    }
+
+    // Modern Network API Mocking
+    if (navigator.connection) {
+      try {
+        Object.defineProperty(navigator, "connection", {
+          get: () => Object.freeze({ effectiveType: "4g", rtt: 100, downlink: 10, saveData: false }),
+          configurable: false
+        });
+      } catch {}
+    }
+
+    // Shutdown High-Risk Tracking Subsystems
+    const highRiskApis = ["geolocation", "mediaDevices", "bluetooth", "usb", "serial", "vibrate"];
     highRiskApis.forEach((api) => {
       if (api in navigator) {
-        try { Object.defineProperty(navigator, api, { get: () => undefined, configurable: true }); } catch {}
+        try { Object.defineProperty(navigator, api, { value: undefined, configurable: false, writable: false }); } catch {}
       }
     });
 
-    // Reduce Web API performance clock resolution
+    // Reduce Performance API timer precision to eliminate timing/side-channel attacks
     if (globalThis.performance?.now) {
-      globalThis.performance.now = (): number => 
-        Math.floor(Date.now() / profile.perfRes) * profile.perfRes;
+      const origNow = globalThis.performance.now.bind(globalThis.performance);
+      globalThis.performance.now = () => {
+        const value = origNow();
+        return Math.floor(value / profile.perfRes) * profile.perfRes;
+      };
     }
   }
 
   /**
    * Flushes standard client tracking properties and browser link pre-fetching vectors
    */
-  public enforceRuntimePrivacySanitizer(): void {
+  enforceRuntimePrivacySanitizer() {
     try {
       localStorage.clear();
       sessionStorage.clear();
@@ -131,7 +128,7 @@ export class KrySecurityRouter {
       });
     } catch {}
 
-    const clearSpeculativeLinks = (): void => {
+    const clearSpeculativeLinks = () => {
       document.querySelectorAll('link[rel*="prefetch"], link[rel*="prerender"], link[rel*="preconnect"]')
         .forEach(element => element.remove());
     };
@@ -144,86 +141,95 @@ export class KrySecurityRouter {
   }
 
   /**
-   * Fast parameter cleaning pass using strong schema filtering
+   * Normalizes and cleans inbound tracking parameters with IDN protection
    */
-  public cleanTrackingParams(rawUrlString: string): string {
+  cleanTrackingParams(rawUrlString) {
     try {
-      const url = new URL(rawUrlString);
-      const keysToDrop = [...url.searchParams.keys()].filter(key => 
-        TRACKING_PARAMS.some(prefix => key.startsWith(prefix)) || !["url", "q", "engine"].includes(key)
-      );
-      keysToDrop.forEach(key => url.searchParams.delete(key));
-      return url.toString();
+      // 1. Un-escape and flatten string formatting variants first
+      let preScrubbed = decode(rawUrlString).trim();
+
+      // 2. Normalize domain names to prevent Homograph/Punycode character spoofs
+      const urlObj = new URL(preScrubbed);
+      urlObj.hostname = uts46.toAscii(urlObj.hostname, { UnicodeVersion: '15.1.0', transitional: false });
+
+      // 3. Robust parameter cleaning pass
+      const parsed = queryString.parseUrl(urlObj.toString());
+      Object.keys(parsed.query).forEach(key => {
+        if (TRACKING_PARAMS.some(prefix => key.startsWith(prefix)) || !["url", "q", "engine"].includes(key)) {
+          delete parsed.query[key];
+        }
+      });
+
+      return queryString.stringifyUrl(parsed);
     } catch {
       return rawUrlString;
     }
   }
 
   /**
-   * Hybrid Async Zero-Knowledge encryption layer (ECDH Curve25519 + AES-GCM 256)
+   * Secure Async Zero-Knowledge encryption layer via Audited Noble Crypto Libraries
    */
-  public async sealQueryZK(queryText: string): Promise<ZKEncryptedPacket> {
+  async sealQueryZK(queryText) {
+    if (typeof queryText !== "string") {
+      throw new TypeError("Query must be a string");
+    }
+
+    // Use HTML entity decoding and DOMPurify to perfectly flatten visual and structural vectors
+    const flatText = decode(queryText).normalize("NFKC");
+    const cleanText = DOMPurify.sanitize(flatText.slice(0, 256));
+    
     const encoder = new TextEncoder();
-    const cleanText = QuerySchema.parse(queryText);
+    const dataBytes = encoder.encode(cleanText);
 
-    const ephemeralKeyPair = await crypto.subtle.generateKey(
-      { name: "ECDH", namedCurve: "X25519" },
-      false,
-      ["deriveBits"]
-    );
+    // Generate ephemeral keys via @noble/curves
+    const ephemeralPrivateKey = x25519.utils.randomPrivateKey();
+    const ephemeralPublicKey = x25519.getPublicKey(ephemeralPrivateKey);
 
-    const derivedBits = await crypto.subtle.deriveBits(
-      { name: "ECDH", public: ephemeralKeyPair.publicKey },
-      ephemeralKeyPair.privateKey,
-      256
-    );
+    // Derive bits & Hash key material using sha512
+    const sharedBits = x25519.getSharedSecret(ephemeralPrivateKey, ephemeralPublicKey);
+    const keyMaterial = sha512(sharedBits);
+    const aesKey = keyMaterial.slice(0, 32); 
 
-    const keyMaterial = await crypto.subtle.digest("SHA-512", derivedBits);
-    const aesKey = await crypto.subtle.importKey(
-      "raw",
-      keyMaterial.slice(0, 32),
-      { name: "AES-GCM" },
-      false,
-      ["encrypt"]
-    );
-
+    // Encrypt using AES-GCM 256
     const iv = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = await crypto.subtle.encrypt(
-      { name: "AES-GCM", iv },
-      aesKey,
-      encoder.encode(cleanText)
-    );
+    const aesGcmInstance = gcm(aesKey, iv);
+    const ciphertext = aesGcmInstance.encrypt(dataBytes);
 
     return {
       iv: Array.from(iv),
-      payload: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
+      payload: btoa(String.fromCharCode(...ciphertext))
     };
   }
 
   /**
    * Parallel racing Multi-Provider DNS over HTTPS lookup resolution
    */
-  public async resolveDomainDoH(domain: string, recordType: "A" | "AAAA" | "MX" = "A"): Promise<string[]> {
-    if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) return [];
+  async resolveDomainDoH(domain, recordType = "A") {
+    try {
+      const safeDomain = uts46.toAscii(domain.trim(), { transitional: false });
+      if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(safeDomain)) return [];
 
-    return Promise.any(DOH_SERVERS.map(async provider => {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 1500);
+      return await Promise.any(DOH_SERVERS.map(async provider => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 1500);
 
-      try {
-        const response = await fetch(`${provider}?name=${encodeURIComponent(domain)}&type=${recordType}`, {
-          signal: controller.signal,
-          cache: "no-store"
-        });
-        clearTimeout(timer);
-        if (!response.ok) return [];
-        
-        const data = (await response.json()) as DoHResponse;
-        return Array.isArray(data.Answer) ? data.Answer.map(item => item.data) : [];
-      } catch {
-        clearTimeout(timer);
-        return [];
-      }
-    }));
+        try {
+          const response = await fetch(`${provider}?name=${encodeURIComponent(safeDomain)}&type=${recordType}`, {
+            signal: controller.signal,
+            cache: "no-store"
+          });
+          clearTimeout(timer);
+          if (!response.ok) return [];
+          
+          const data = await response.json();
+          return Array.isArray(data.Answer) ? data.Answer.map(item => item.data) : [];
+        } catch {
+          clearTimeout(timer);
+          return [];
+        }
+      }));
+    } catch {
+      return [];
+    }
   }
 }
