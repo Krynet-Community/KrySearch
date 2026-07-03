@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-900">
 <head>
+  <script>
+    globalThis.ns_setupCallback = globalThis.ns_setupCallback || function() {};
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>KrySearch</title>
@@ -9,14 +12,25 @@
   <meta name="color-scheme" content="dark">
   <meta http-equiv="Permissions-Policy" content="accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),clipboard-read=(),clipboard-write=(),display-capture=(),document-domain=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),hid=(),idle-detection=(),interest-cohort=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),usb=(),web-share=(),xr-spatial-tracking=()">
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Krynet-LLC/KrySearch/main/lgoo.png">
-  <link rel="preload" as="image" href="https://raw.githubusercontent.com/Krynet-LLC/KrySearch/main/lgoo.png">
 </head>
-<body class="flex items-center justify-center h-screen text-gray-100 m-0 overflow-hidden">
-  <script>
-    globalThis.ns_setupCallback = globalThis.ns_setupCallback || function() {};
-  </script>
-  <div id="app" class="w-full flex items-center justify-center"></div>
-  
+<body class="flex items-center justify-center h-screen text-gray-100 m-0 overflow-hidden bg-gray-900">
+  <div id="app" class="w-full max-w-md mx-auto p-4 flex flex-col items-center justify-center gap-6">
+    <img src="https://raw.githubusercontent.com/Krynet-LLC/KrySearch/main/lgoo.png" alt="KrySearch Logo" class="w-24 h-24 object-contain">
+    <form action="" method="get" class="w-full flex flex-col gap-3">
+      <input 
+        type="text" 
+        name="q" 
+        id="search-input"
+        placeholder="Search securely..." 
+        className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+        required
+        autocomplete="off"
+      >
+      <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 font-medium text-white rounded-xl transition-colors">
+        KrySearch Secure Route
+      </button>
+    </form>
+    </div>
   <noscript class="text-center p-6 text-red-400 max-w-md mx-auto bg-gray-800 rounded-2xl border border-red-900">
     <p class="font-bold mb-4">JavaScript is required for advanced anti-fingerprinting protection.</p>
     <form action="/" method="get" class="flex flex-col gap-2">
