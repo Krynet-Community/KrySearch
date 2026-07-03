@@ -1,6 +1,5 @@
 "use strict";
 
-// Fixed: Using the exact relative path matching your folder tree screenshot
 import { KrySecurityRouter } from './Modules/security-router.js';
 
 (async () => {
