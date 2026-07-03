@@ -1,7 +1,7 @@
 "use strict";
 
 // Import directly from the production GitHub repository file path
-import { KrySecurityRouter } from 'https://raw.githubusercontent.com/Krynet-LLC/KrySearch/refs/heads/main/UI/Modules/security-router.js';
+import { KrySecurityRouter } from 'UI/Modules/security-router.js';
 
 (async () => {
   const p = new URLSearchParams(location.search);
