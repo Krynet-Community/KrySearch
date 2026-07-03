@@ -1,12 +1,11 @@
 "use strict";
-
-import DOMPurify from 'dompurify';
-import { x25519 } from '@noble/curves/ed25519';
-import { gcm } from '@noble/ciphers/aes';
-import { sha512 } from '@noble/hashes/sha512';
-import queryString from 'query-string';
-import uts46 from 'idna-uts46-hx'; // Industry-standard IDNA2008 URL normalization
-import { decode } from 'html-entities'; // Flattens all hidden encoding variations
+import DOMPurify from 'https://esm.sh/dompurify@3.1.5';
+import { x25519 } from 'https://esm.sh/@noble/curves@1.4.0/ed25519';
+import { gcm } from 'https://esm.sh/@noble/ciphers@0.4.1/aes';
+import { sha512 } from 'https://esm.sh/@noble/hashes@1.4.0/sha512';
+import queryString from 'https://esm.sh/query-string@9.0.0';
+import uts46 from 'https://esm.sh/idna-uts46-hx@1.1.0';
+import { decode } from 'https://esm.sh/html-entities@2.5.2';
 
 /* ==========================================================================
    1. CONFIGURATION
