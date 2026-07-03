@@ -1,7 +1,7 @@
 "use strict";
 
-// Import directly from the production GitHub repository file path
-import { KrySecurityRouter } from 'UI/Modules/security-router.js';
+// Fixed: Using the exact relative path matching your folder tree screenshot
+import { KrySecurityRouter } from './Modules/security-router.js';
 
 (async () => {
   const p = new URLSearchParams(location.search);
@@ -35,8 +35,8 @@ import { KrySecurityRouter } from 'UI/Modules/security-router.js';
   // 🔧 Load config
   let CONFIG;
   try {
-    // Relative back up pathing if search.js runs inside the UI directory context
-    const res = await fetch("../Config/config.json", { cache: "no-store" });
+    // Fixed: Based on the screenshot, Config is a sibling folder to index.html/search.js
+    const res = await fetch("./Config/config.json", { cache: "no-store" });
     if (!res.ok) throw new Error(res.status);
     CONFIG = await res.json();
   } catch (e) { return console.error("[KrySearch] Failed to load config.json", e) }
