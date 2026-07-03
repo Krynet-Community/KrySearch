@@ -1,6 +1,6 @@
 "use strict";
 
-import { KrySecurityRouter } from '.Modules/security-router.js';
+import { KrySecurityRouter } from './Modules/security-router.js';
 
 (async () => {
   const p = new URLSearchParams(location.search);
