@@ -8,11 +8,15 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="color-scheme" content="dark">
   <meta http-equiv="Permissions-Policy" content="accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),clipboard-read=(),clipboard-write=(),display-capture=(),document-domain=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),hid=(),idle-detection=(),interest-cohort=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),usb=(),web-share=(),xr-spatial-tracking=()">
-  <link rel="icon" type="image/png" href="https://github.com/Bloodware-Inc/KrySearch/raw/main/lgoo.png">
-  <link rel="preload" as="image" href="https://github.com/Bloodware-Inc/KrySearch/raw/main/lgoo.png">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Krynet-LLC/KrySearch/main/lgoo.png">
+  <link rel="preload" as="image" href="https://raw.githubusercontent.com/Krynet-LLC/KrySearch/main/lgoo.png">
 </head>
 <body class="flex items-center justify-center h-screen text-gray-100 m-0 overflow-hidden">
+  <script>
+    globalThis.ns_setupCallback = globalThis.ns_setupCallback || function() {};
+  </script>
   <div id="app" class="w-full flex items-center justify-center"></div>
+  
   <noscript class="text-center p-6 text-red-400 max-w-md mx-auto bg-gray-800 rounded-2xl border border-red-900">
     <p class="font-bold mb-4">JavaScript is required for advanced anti-fingerprinting protection.</p>
     <form action="/" method="get" class="flex flex-col gap-2">
@@ -20,6 +24,6 @@
       <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-xl">Basic Search</button>
     </form>
   </noscript>
-  <script type="module" src="search.js"></script>
+  <script type="module" src="../src/search.js"></script>
 </body>
 </html>
