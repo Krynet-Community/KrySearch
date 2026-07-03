@@ -3,11 +3,10 @@
     "name": "KrySearch",
     "description": "Privacy-first search router for open and privacy-focused engines",
     "url": "https://krysearch.io",
-    "logo": "https://raw.githubusercontent.com/Bloodware-Inc/KrySearch/main/lgoo.png?raw=true",
+    "logo": "https://raw.githubusercontent.com/Bloodware-Inc/KrySearch/main/lgoo.png",
     "theme": "dark",
     "language": "en-US"
   },
-
   "search": {
     "defaultEngine": "startpage",
     "maxResults": 50,
@@ -15,105 +14,89 @@
     "autocomplete": true,
     "highlightTerms": true
   },
-
   "engines": {
-    "open_source": {
-      "searxng": {
-        "name": "SearXNG",
-        "description": "Open-source metasearch engine aggregating results privately",
-        "url": "https://searx.space/?q={query}",
-        "base": "https://searx.space/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "yacy": {
-        "name": "YaCy",
-        "description": "Decentralized peer-to-peer search engine",
-        "url": "https://search.yacy.net/Search?query={query}",
-        "base": "https://search.yacy.net/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "mojeek": {
-        "name": "Mojeek",
-        "description": "Independent crawler and index, no tracking",
-        "url": "https://www.mojeek.com/search?q={query}",
-        "base": "https://www.mojeek.com/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "metager": {
-        "name": "MetaGer",
-        "description": "Open-source privacy-oriented metasearch from Germany",
-        "url": "https://metager.org/search?q={query}",
-        "base": "https://metager.org/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      }
+    "searxng": {
+      "name": "SearXNG",
+      "type": "open_source",
+      "description": "Open-source metasearch engine aggregating results privately",
+      "url": "https://searx.space/?q={query}",
+      "base": "https://searx.space/",
+      "secureHeaders": true,
+      "disableTracking": true
     },
-
-    "closed_source": {
-      "startpage": {
-        "name": "Startpage",
-        "description": "Google results without tracking",
-        "url": "https://www.startpage.com/sp/search?query={query}",
-        "base": "https://www.startpage.com/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "duckduckgo": {
-        "name": "DuckDuckGo",
-        "description": "Privacy-focused search engine",
-        "url": "https://duckduckgo.com/?q={query}&kl=wt-wt",
-        "base": "https://duckduckgo.com/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "brave": {
-        "name": "Brave Search",
-        "description": "Independent privacy-focused search by Brave",
-        "url": "https://search.brave.com/search?q={query}",
-        "base": "https://search.brave.com/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "swisscows": {
-        "name": "Swisscows",
-        "description": "Family-friendly privacy-first search",
-        "url": "https://swisscows.com/web?query={query}",
-        "base": "https://swisscows.com/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      },
-      "presearch": {
-        "name": "Presearch",
-        "description": "Decentralized privacy search engine",
-        "url": "https://presearch.com/search?q={query}",
-        "base": "https://presearch.com/",
-        "mode": "query",
-        "appendInput": true,
-        "secureHeaders": true,
-        "disableTracking": true
-      }
+    "yacy": {
+      "name": "YaCy",
+      "type": "open_source",
+      "description": "Decentralized peer-to-peer search engine",
+      "url": "https://search.yacy.net/Search?query={query}",
+      "base": "https://search.yacy.net/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "mojeek": {
+      "name": "Mojeek",
+      "type": "open_source",
+      "description": "Independent crawler and index, no tracking",
+      "url": "https://www.mojeek.com/search?q={query}",
+      "base": "https://www.mojeek.com/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "metager": {
+      "name": "MetaGer",
+      "type": "open_source",
+      "description": "Open-source privacy-oriented metasearch from Germany",
+      "url": "https://metager.org/search?q={query}",
+      "base": "https://metager.org/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "startpage": {
+      "name": "Startpage",
+      "type": "closed_source",
+      "description": "Google results without tracking",
+      "url": "https://www.startpage.com/sp/search?query={query}",
+      "base": "https://www.startpage.com/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "duckduckgo": {
+      "name": "DuckDuckGo",
+      "type": "closed_source",
+      "description": "Privacy-focused search engine",
+      "url": "https://duckduckgo.com/?q={query}&kl=wt-wt",
+      "base": "https://duckduckgo.com/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "brave": {
+      "name": "Brave Search",
+      "type": "closed_source",
+      "description": "Independent privacy-focused search by Brave",
+      "url": "https://search.brave.com/search?q={query}",
+      "base": "https://search.brave.com/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "swisscows": {
+      "name": "Swisscows",
+      "type": "closed_source",
+      "description": "Family-friendly privacy-first search",
+      "url": "https://swisscows.com/web?query={query}",
+      "base": "https://swisscows.com/",
+      "secureHeaders": true,
+      "disableTracking": true
+    },
+    "presearch": {
+      "name": "Presearch",
+      "type": "closed_source",
+      "description": "Decentralized privacy search engine",
+      "url": "https://presearch.com/search?q={query}",
+      "base": "https://presearch.com/",
+      "secureHeaders": true,
+      "disableTracking": true
     }
   },
-
   "appearance": {
     "font": "Inter, sans-serif",
     "colors": {
