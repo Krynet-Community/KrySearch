@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full bg-gray-900">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,65 +8,18 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="color-scheme" content="dark">
   <meta http-equiv="Permissions-Policy" content="accelerometer=(),ambient-light-sensor=(),autoplay=(),battery=(),camera=(),clipboard-read=(),clipboard-write=(),display-capture=(),document-domain=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),hid=(),idle-detection=(),interest-cohort=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),usb=(),web-share=(),xr-spatial-tracking=()">
-
-  <!-- Favicon & Preload -->
   <link rel="icon" type="image/png" href="https://github.com/Bloodware-Inc/KrySearch/raw/main/lgoo.png">
   <link rel="preload" as="image" href="https://github.com/Bloodware-Inc/KrySearch/raw/main/lgoo.png">
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- JS Licenses -->
-  <link rel="jslicense" href="./js-licenses.html">
 </head>
-<body class="flex items-center justify-center h-screen bg-gray-100 font-sans text-gray-800">
-
-  <main class="text-center w-full max-w-lg p-10 bg-white rounded-3xl shadow-lg">
-    <img src="https://github.com/Bloodware-Inc/KrySearch/raw/main/lgoo.png" 
-         alt="KrySearch Logo" 
-         class="mx-auto mb-6 w-30 h-auto" loading="lazy">
-    <h1 class="text-4xl font-bold mb-6 text-gray-800">KrySearch</h1>
-
-    <input id="q" type="search" placeholder="Search or paste URL" class="input-field mb-4">
-
-    <select id="engine" class="select-field mb-4"></select>
-
-    <button id="go" class="btn-primary">Go</button>
-
-    <div id="status" class="mt-6 text-gray-500 text-sm">Private search mode</div>
-
-    <footer class="mt-10 text-gray-400 text-xs">
-      Powered by <a href="?url=https://Krynet.ai" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">Krynet, LLC</a>
-    </footer>
-  </main>
-
-  <noscript class="text-center p-4 text-red-500">
-    <p><strong>JavaScript is disabled. Please enable it to use this website.</strong></p>
-    <form action="/" method="get" class="mt-4">
-      <input type="text" id="q" name="q" placeholder="Enter your search" class="input-field mb-2">
-      <button type="submit" class="btn-primary">Go</button>
+<body class="flex items-center justify-center h-screen text-gray-100 m-0 overflow-hidden">
+  <div id="app" class="w-full flex items-center justify-center"></div>
+  <noscript class="text-center p-6 text-red-400 max-w-md mx-auto bg-gray-800 rounded-2xl border border-red-900">
+    <p class="font-bold mb-4">JavaScript is required for advanced anti-fingerprinting protection.</p>
+    <form action="/" method="get" class="flex flex-col gap-2">
+      <input type="text" name="q" placeholder="Enter your search" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-xl text-white">
+      <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-xl">Basic Search</button>
     </form>
   </noscript>
-
-  <!-- Core Modules -->
-  <script src="Modules/privacy.clean.js" defer></script>
-  <script src="Modules/privacy.hardening.js" defer></script>
-  <script src="Modules/feature-lockdown.js" defer></script>
-  <script src="Modules/total-fingerprint-hardening.js" defer></script>
-  <script src="Modules/ultra-adaptive-quad9-doh.js" defer></script>
-  <script src="Modules/privacy.fingerprint.js" defer></script>
-  <script src="Modules/secure-transport-ultra.js" defer></script>
-  <script src="Modules/native-url-launcher.js" defer></script>
-  <script src="Modules/absolute-url-lockdown-max.js" defer></script>
-  <script src="Modules/query-param-lockdown.js" defer></script>
-  <script src="Modules/zero-knowledge.js" defer></script>
-  <script src="Modules/zk-gsb-equivalent.js" defer></script>
-  <script src="Modules/zk-libredirect-advanced.js" defer></script>
-
-  <!-- Search Router -->
-  <script src="search.js" defer></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 </html>
