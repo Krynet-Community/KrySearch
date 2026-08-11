@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes, as they only include source files (.js and .html) without any build artifacts, dependencies, or temporary files.
+Nothing needs to be added to .gitignore since the changes only include HTML and JavaScript source files (UI/search.html, UI/index.html, UI/search.js) which are legitimate source code files that should be tracked in version control.

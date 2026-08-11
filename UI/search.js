@@ -1,6 +1,7 @@
 "use strict";
 
-import { KrySecurityRouter } from './Modules/security-router.js';
+// KrySearch - Privacy-focused search router
+// This module handles secure search redirection with anti-fingerprinting protection
 
 (function() {
   // Early error handler for graceful degradation
@@ -8,8 +9,20 @@ import { KrySecurityRouter } from './Modules/security-router.js';
     console.warn('[KrySearch] Unhandled promise:', e.reason);
     e.preventDefault();
   });
-
+  
   const init = async () => {
+    // Dynamically import the security router
+    let KrySecurityRouter;
+    try {
+      const module = await import('./Modules/security-router.js');
+      KrySecurityRouter = module.KrySecurityRouter;
+    } catch (err) {
+      console.error("[KrySearch] Failed to load security module:", err);
+      // Use fallback without security features
+      runSearchFallback();
+      return;
+    }
+
     const params = new URLSearchParams(location.search);
     const query = params.get("q");
     const directUrl = params.get("url");
@@ -35,8 +48,11 @@ import { KrySecurityRouter } from './Modules/security-router.js';
       return location.replace(target);
     }
 
-    // No search query - exit early without errors
-    if (!query) return;
+    // No search query - redirect to home page
+    if (!query) {
+      location.href = "./index.html";
+      return;
+    }
 
     // Load config with timeout protection
     let CONFIG;
@@ -88,4 +104,17 @@ import { KrySecurityRouter } from './Modules/security-router.js';
   init().catch(err => {
     console.error("[KrySearch] Initialization failed:", err);
   });
+
+  function runSearchFallback() {
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
+    
+    if (!query) {
+      location.href = "./index.html";
+      return;
+    }
+    
+    // Simple fallback without security features
+    location.replace(`https://www.google.com/search?q=${encodeURIComponent(query)}`);
+  }
 })();
