@@ -3,14 +3,13 @@
 // KrySearch - Privacy-focused search router
 // This module handles secure search redirection with anti-fingerprinting protection
 
-(function() {
-  // Early error handler for graceful degradation
-  window.addEventListener('unhandledrejection', function(e) {
-    console.warn('[KrySearch] Unhandled promise:', e.reason);
-    e.preventDefault();
-  });
-  
-  const init = async () => {
+// Early error handler for graceful degradation
+window.addEventListener('unhandledrejection', function(e) {
+  console.warn('[KrySearch] Unhandled promise:', e.reason);
+  e.preventDefault();
+});
+
+const init = async () => {
     // Dynamically import the security router
     let KrySecurityRouter;
     try {
@@ -117,4 +116,3 @@
     // Simple fallback without security features
     location.replace(`https://www.google.com/search?q=${encodeURIComponent(query)}`);
   }
-})();

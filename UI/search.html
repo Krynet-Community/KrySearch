@@ -41,6 +41,109 @@
     <div class="spinner"></div>
     <p>Redirecting securely...</p>
   </div>
-  <script type="module" src="search.js"></script>
+  <script type="module">
+    // Inline the search logic to avoid module loading issues on GitHub Pages
+    window.addEventListener('unhandledrejection', function(e) {
+      console.warn('[KrySearch] Unhandled promise:', e.reason);
+      e.preventDefault();
+    });
+
+    const init = async () => {
+      let KrySecurityRouter;
+      try {
+        const module = await import('./Modules/security-router.js');
+        KrySecurityRouter = module.KrySecurityRouter;
+      } catch (err) {
+        console.error("[KrySearch] Failed to load security module:", err);
+        runSearchFallback();
+        return;
+      }
+
+      const params = new URLSearchParams(location.search);
+      const query = params.get("q");
+      const directUrl = params.get("url");
+      const forcedEngine = params.get("engine");
+
+      if (!query && !directUrl) {
+        location.href = "./index.html";
+        return;
+      }
+
+      const router = new KrySecurityRouter(forcedEngine || "default");
+
+      if (directUrl) {
+        router.initializeFingerprintHardening();
+        router.enforceRuntimePrivacySanitizer();
+
+        let target = directUrl.startsWith("http") ? directUrl : "https://" + directUrl;
+        try {
+          target = router.cleanTrackingParams(target);
+          target = new URL(target).href;
+        } catch {
+          return console.warn("[KrySearch] Invalid URL:", directUrl);
+        }
+
+        try { history.replaceState(null, "", "/"); } catch {}
+        return location.replace(target);
+      }
+
+      let CONFIG;
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const res = await fetch("./Config/config.json", {
+          cache: "no-store",
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        CONFIG = await res.json();
+      } catch (e) {
+        console.error("[KrySearch] Failed to load config.json:", e.message);
+        CONFIG = {
+          search: { defaultEngine: "default" },
+          engines: {
+            default: { url: "https://www.google.com/search?q={query}" }
+          }
+        };
+      }
+
+      router.initializeFingerprintHardening();
+      router.enforceRuntimePrivacySanitizer();
+
+      const engines = CONFIG.engines || {};
+      const engineKey = (forcedEngine && engines[forcedEngine]) ? forcedEngine : (CONFIG.search?.defaultEngine || "default");
+      const engine = engines[engineKey];
+
+      if (!engine?.url) {
+        console.error("[KrySearch] Missing engine URL, using fallback");
+        return location.replace(`https://www.google.com/search?q=${encodeURIComponent(query)}`);
+      }
+
+      const cleanQuery = router.cleanTrackingParams(query);
+      try { history.replaceState(null, "", "/"); } catch {}
+
+      location.replace(engine.url.replace("{query}", encodeURIComponent(cleanQuery)));
+    };
+
+    init().catch(err => {
+      console.error("[KrySearch] Initialization failed:", err);
+      runSearchFallback();
+    });
+
+    function runSearchFallback() {
+      const params = new URLSearchParams(location.search);
+      const query = params.get("q");
+      
+      if (!query) {
+        location.href = "./index.html";
+        return;
+      }
+      
+      location.replace(`https://www.google.com/search?q=${encodeURIComponent(query)}`);
+    }
+  </script>
 </body>
 </html>
