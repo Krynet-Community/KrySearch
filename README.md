@@ -18,12 +18,12 @@ Search privately, strip corporate tracking telemetry, neutralize active browser 
 |---------|-------------|
 | ✅ LibreJS Compatible | Fully compatible with LibreJS |
 | 🟢 Free Software | GPL-3.0-or-later, self-hosted JS |
-| 🛡️ Fingerprint Hardening | **[New]** Normalizes Canvas data, flattens `getBoundingClientRect` DOM vectors, masks network connection types, and caps `performance.now()` precision to mitigate hardware timing/side-channel attacks. |
-| 🧼 Telemetry Sanitizer | **[New]** Flushes active tracking URL parameters (`utm_*`, `fbclid`, `gclid`), strips out speculative pre-fetching links dynamically via a unified `MutationObserver`, and flushes storage states on navigation. |
-| 🔑 Zero-Knowledge Relay | **[New]** Structural input sanitization coupled with an asynchronous cryptographic sealing process using localized ECDH and AES-GCM 256. |
-| 🌐 Multi-Provider DoH | **[New]** Integrates a parallel racing DNS over HTTPS lookup engine checking across Quad9, Google, and Cloudflare. |
+| 🛡️ Advanced Fingerprint Protection | **[New]** Comprehensive anti-fingerprinting suite: Canvas noise injection (2% randomization), WebGL vendor/renderer spoofing, timezone standardization (UTC), language/locale normalization, AudioContext fingerprint protection, and hardware concurrency masking. Blocks 50+ tracking parameters including `utm_*`, `fbclid`, `gclid`, and platform-specific identifiers. |
+| 🧼 Telemetry Sanitizer | Flushes active tracking URL parameters, strips speculative pre-fetching links via `MutationObserver`, blocks Resource Timing API, disables `navigator.sendBeacon`, and implements multi-domain/path cookie clearing. |
+| 🔑 Zero-Dependency Architecture | **[New]** Complete removal of external CDN dependencies (esm.sh). All cryptographic operations use native Web Crypto API (AES-GCM, ECDH). Native implementations replace DOMPurify, query-string, IDNA/UTS46, and HTML entities libraries. Works fully offline. |
+| 🌐 Native Search Interface | **[New]** Dedicated `search.html` page eliminates GitHub Pages MIME-type issues. Inline script execution prevents code display bugs. Guard clauses prevent infinite reload loops on home page. |
 | 🔀 Multiple Engines | Open-source & closed-source backend options |
-| 🧱 No Cloud Dependencies | **[New]** Zero-dependency design. All core cryptographic and sanitation primitives execute via hardened local logic to remain independent of external network CDNs. |
+| ⚡ Performance Optimized | Deferred security initialization, O(1) Set-based parameter lookups, DNS prefetching removed (no external deps), lazy/eager image loading optimization, cached property access. |
 
 ---
 
@@ -31,18 +31,20 @@ Search privately, strip corporate tracking telemetry, neutralize active browser 
 
 **KrySearch** acts as a secure processing gateway layer:
 
-1. **User Input** – The user inputs a query or direct tracking link.
-2. **Environment Normalization** – Core runtime elements are immediately overridden to obscure the specific browser fingerprint profile.
-3. **Telemetry Cleansing** – Tracking query parameters are scrubbed, and domain lookups are validated.
-4. **Search Routing** – The clean request is forwarded directly to the selected target engine.
+1. **User Input** – The user inputs a query or direct tracking link via `index.html`.
+2. **Native Search Routing** – Request is directed to `search.html`, which executes inline JavaScript without external dependencies.
+3. **Environment Normalization** – Core runtime elements are immediately overridden: Canvas noise injected, WebGL spoofed, timezone/language standardized, AudioContext protected.
+4. **Telemetry Cleansing** – 50+ tracking parameters scrubbed, cookies flushed across domains/paths, Resource Timing API blocked, sendBeacon disabled.
+5. **Zero-Knowledge Processing** – Input sanitized using native implementations, encrypted via Web Crypto API (AES-GCM), and forwarded to target engine.
+6. **Search Routing** – The clean request is forwarded directly to the selected target engine with no logging or retention.
 
 ---
 
 ## 🚀 Installation & Deployment
 
-> [!CRITICAL]
-> **Hosting on Standard GitHub Pages is Not Supported**
-> GitHub Pages enforces content-type handling restrictions that serve internal script files as `text/plain`, which triggers strict browser MIME type blocking on native ES Modules. Furthermore, GitHub Pages cannot handle the cross-origin headers required to preserve deep anti-fingerprinting isolations. KrySearch **must** be run using a local web server, containerized instance, or dedicated host mapped to a domain like `krysearch.io`.
+> [!NOTE]
+> **GitHub Pages Compatibility**
+> KrySearch now includes `search.html` with inline JavaScript to resolve GitHub Pages MIME-type issues that previously caused `.js` files to display as plain text. However, for full privacy protection and anti-fingerprinting isolation, deployment on a dedicated domain (e.g., `krysearch.io`) with proper HTTPS headers is still recommended over standard GitHub Pages hosting.
 
 ### Prerequisites
 
@@ -53,18 +55,22 @@ Search privately, strip corporate tracking telemetry, neutralize active browser 
 
 ```bash
 # Clone the official repository
-git clone [https://github.com/Krynet-LLC/KrySearch.git](https://github.com/Krynet-LLC/KrySearch.git)
+git clone https://github.com/Krynet-LLC/KrySearch.git
 
 # Enter the project directory
 cd KrySearch/UI
 
-# Start a local self-contained web server to process the module imports:
-# Option A: Python
-python3 -m http-server 8080
+# Start a local self-contained web server:
+# Option A: Python 3
+python3 -m http.server 8080
 
 # Option B: Node.js http-server
 npx http-server -p 8080
 
+# Option C: Direct GitHub Pages deployment
+# Upload contents of UI/ folder to your GitHub repository
+# Enable GitHub Pages in repository settings
+# Access via: https://yourusername.github.io/KrySearch/search.html
 ```
 
 Open your browser and navigate to `http://localhost:8080` to access the interface.
@@ -90,9 +96,9 @@ Open your browser and navigate to `http://localhost:8080` to access the interfac
 **Example URLs (Production Formatting):**
 
 ```
-[https://krysearch.io/?q=privacy+sovereignty](https://krysearch.io/?q=privacy+sovereignty)
-[https://krysearch.io/?url=example.com&engine=tor](https://krysearch.io/?url=example.com&engine=tor)
-
+https://krysearch.io/?q=privacy+sovereignty
+https://krysearch.io/?url=example.com&engine=tor
+https://yourusername.github.io/KrySearch/search.html?q=test
 ```
 
 ---
@@ -101,7 +107,9 @@ Open your browser and navigate to `http://localhost:8080` to access the interfac
 
 * **Icelandic Jurisdiction** – Krynet, LLC operates out of Iceland 🇮🇸, utilizing the region's robust data protection laws, freedom of expression protections, and isolation from invasive multi-national bulk surveillance data sharing programs.
 * **No Data Retention** – Queries are structurally handled purely at runtime; no query tracking database, transaction logs, or cookie structures exist.
-* **Hardware Footprint Masking** – Standardizes `hardwareConcurrency` to uniform thresholds, effectively blending your request profile into a massive crowd of generic devices.
+* **Comprehensive Fingerprint Protection** – Canvas noise injection (2% randomization), WebGL vendor/renderer spoofing, timezone standardization (UTC), language/locale normalization, AudioContext protection, hardware concurrency masking, and blocking of 50+ tracking parameters.
+* **Zero External Dependencies** – All cryptographic operations use native Web Crypto API. No CDN connections, no third-party libraries, works fully offline.
+* **Advanced Telemetry Blocking** – Resource Timing API disabled, navigator.sendBeacon blocked, multi-domain/path cookie clearing, MutationObserver strips tracking links dynamically.
 
 ---
 
@@ -149,25 +157,36 @@ Edit your local `./Config/config.json` file to update your search routing mappin
   "engines": {
     "my_engine": {
       "name": "Custom Engine",
-      "url": "[https://customengine.org/search?q=](https://customengine.org/search?q=){query}"
+      "url": "https://customengine.org/search?q={query}"
     }
   }
 }
 
 ```
 
-If you introduce additional localized script assets into the `/UI/Modules/` workspace, map their aliases within the `importmap` block inside `index.html`:
+### File Structure
+
+```
+UI/
+├── index.html          # Home page with search form
+├── search.html         # Search processor (inline JS, no external deps)
+├── security-router.js  # Core privacy & fingerprint protection module
+├── lgoo.png            # Logo image
+└── Config/
+    └── config.json     # Search engine configuration
+```
+
+If you introduce additional localized script assets into the `/UI/` workspace, map their aliases within the `importmap` block inside `index.html`:
 
 ```html
 <script type="importmap">
   {
     "imports": {
-      "security-router": "./Modules/security-router.js",
-      "new-module": "./Modules/new-module.js"
+      "security-router": "./security-router.js",
+      "new-module": "./new-module.js"
     }
   }
 </script>
-
 ```
 
 ---
@@ -185,5 +204,6 @@ Krynet, LLC is a privacy-first tech company building secure, decentralized, and 
 ## 🔑 License
 
 KrySearch is free software licensed under the terms of the **GNU GPL v3**. See the [Official GNU License Portal](https://www.gnu.org/licenses/gpl-3.0) for detailed rights, distribution rules, and copyleft specifications.
+
 
 ```
