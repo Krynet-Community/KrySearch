@@ -11,7 +11,7 @@ import { decode } from 'https://esm.sh/html-entities@2.5.2';
    1. CONFIGURATION
    ========================================================================== */
 
-const TRACKING_PARAMS = ["utm_", "fbclid", "gclid", "_ga", "_gl", "_gid"];
+const TRACKING_PARAMS = ["utm_", "fbclid", "gclid", "_ga", "_gl", "_gid", "mc_eid", "mkt_tok", "pk_vid", "ssrt", "_bta_tid", "_bta_c", "trk_contact", "trk_msg", "trk_module", "trk_sid", "gdfms", "gdftrk", "gdffi", "_ke", "redirect_log_mongo_id", "redirect_mongo_id", "sb_referer_host", "mkwid", "_bt", "_bm", "bfbsk", "ef_id", "s_kwcid", "msclkid", "dm_i", "epik", "pp", "spJobID", "spMailingID", "spUserID", "spTransactionID", "spCampaignId", "spReportId", "li_fat_id", "twclid", "hsa_cam", "hsa_grp", "hsa_mt", "hsa_src", "hsa_ad", "hsa_acc", "hsa_net", "hsa_ver", "wbraid", "gbraid"];
 const ALLOWED_PARAMS = new Set(["url", "q", "engine"]);
 
 const DOH_SERVERS = [
@@ -19,6 +19,19 @@ const DOH_SERVERS = [
   "https://dns.google/dns-query",
   "https://cloudflare-dns.com/dns-query"
 ];
+
+// Enhanced fingerprinting protection constants
+const FINGERPRINT_NOISE_CONFIG = {
+  canvasNoise: 0.02,
+  audioNoise: 0.001,
+  webglVendor: "Google Inc.",
+  webglRenderer: "ANGLE (Google, Vulkan 1.2.0, SwiftShader)",
+  timezone: "UTC",
+  language: "en-US",
+  languages: ["en-US", "en"],
+  platform: "Win32",
+  oscpu: "Windows NT 10.0; Win64; x64"
+};
 
 /* ==========================================================================
    2. CORE SECURITY ENGINE CLASS
@@ -28,27 +41,66 @@ export class KrySecurityRouter {
   constructor(engineProfile = "default") {
     this.engineProfile = engineProfile;
     this.profiles = {
-      default: { vendor: "KrySearch", renderer: "KrySearch Renderer", perfRes: 100 },
+      default: { vendor: "Google Inc.", renderer: "ANGLE (Google, Vulkan 1.2.0, SwiftShader)", perfRes: 100 },
       tor: { vendor: "Mozilla", renderer: "Gecko", perfRes: 100 },
       chromium: { vendor: "Google Inc.", renderer: "ANGLE", perfRes: 50 }
     };
+    this.initialized = false;
   }
 
   /**
    * Hardens and standardizes the runtime fingerprint surface area using deep object freezing
    */
   initializeFingerprintHardening() {
+    if (this.initialized) return;
+    this.initialized = true;
+    
     const profile = this.profiles[this.engineProfile] || this.profiles.default;
 
-    // Standardize Canvas surface responses (cached prototype references)
+    // Standardize Canvas surface responses with subtle noise injection
     if (globalThis.HTMLCanvasElement?.prototype.toDataURL) {
-      globalThis.HTMLCanvasElement.prototype.toDataURL = () => 
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB";
+      globalThis.HTMLCanvasElement.prototype.toDataURL = function(type) {
+        try {
+          const ctx = this.getContext('2d');
+          if (ctx) {
+            const imageData = ctx.getImageData(0, 0, 1, 1);
+            const noise = FINGERPRINT_NOISE_CONFIG.canvasNoise;
+            imageData.data[0] = Math.min(255, imageData.data[0] + noise * 255);
+            imageData.data[1] = Math.min(255, imageData.data[1] + noise * 255);
+            imageData.data[2] = Math.min(255, imageData.data[2] + noise * 255);
+            ctx.putImageData(imageData, 0, 0);
+          }
+        } catch {}
+        return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR42mNk+M9QDwADhgGAWjR9pAAAABJRU5ErkJggg==";
+      };
     }
     
     if (globalThis.CanvasRenderingContext2D?.prototype.getImageData) {
-      globalThis.CanvasRenderingContext2D.prototype.getImageData = (x, y, w, h) => 
-        new ImageData(w, h);
+      const origGetImageData = globalThis.CanvasRenderingContext2D.prototype.getImageData;
+      globalThis.CanvasRenderingContext2D.prototype.getImageData = function(sx, sy, sw, sh) {
+        const imageData = origGetImageData.call(this, sx, sy, sw, sh);
+        const noise = FINGERPRINT_NOISE_CONFIG.canvasNoise;
+        for (let i = 0; i < imageData.data.length; i += 4) {
+          imageData.data[i] = Math.min(255, imageData.data[i] + (Math.random() - 0.5) * noise * 255);
+          imageData.data[i + 1] = Math.min(255, imageData.data[i + 1] + (Math.random() - 0.5) * noise * 255);
+          imageData.data[i + 2] = Math.min(255, imageData.data[i + 2] + (Math.random() - 0.5) * noise * 255);
+        }
+        return imageData;
+      };
+    }
+    
+    // WebGL fingerprint spoofing
+    if (globalThis.WebGLRenderingContext?.prototype.getParameter) {
+      const origGetParameter = globalThis.WebGLRenderingContext.prototype.getParameter;
+      globalThis.WebGLRenderingContext.prototype.getParameter = function(param) {
+        switch (param) {
+          case 0x1F00: return FINGERPRINT_NOISE_CONFIG.webglVendor; // VENDOR
+          case 0x1F01: return FINGERPRINT_NOISE_CONFIG.webglRenderer; // RENDERER
+          case 0x8B8C: return [0]; // UNMASKED_VENDOR_WEBGL
+          case 0x9245: return [0]; // UNMASKED_RENDERER_WEBGL
+          default: return origGetParameter.call(this, param);
+        }
+      };
     }
 
     // Flatten DOM rect measurements to neutralize font/rendering side-channels completely
@@ -70,7 +122,9 @@ export class KrySecurityRouter {
     const targetSpecs = {
       hardwareConcurrency: 4,
       deviceMemory: 8,
-      maxTouchPoints: 0
+      maxTouchPoints: 0,
+      platform: FINGERPRINT_NOISE_CONFIG.platform,
+      oscpu: FINGERPRINT_NOISE_CONFIG.oscpu
     };
 
     for (const [prop, value] of Object.entries(targetSpecs)) {
@@ -86,6 +140,30 @@ export class KrySecurityRouter {
       }
     }
 
+    // Spoof timezone to UTC
+    try {
+      const origIntlDateTimeFormat = globalThis.Intl.DateTimeFormat;
+      globalThis.Intl.DateTimeFormat = function(locales, options) {
+        if (!options) options = {};
+        options.timeZone = FINGERPRINT_NOISE_CONFIG.timezone;
+        return new origIntlDateTimeFormat(locales, options);
+      };
+      globalThis.Intl.DateTimeFormat.prototype = origIntlDateTimeFormat.prototype;
+      globalThis.Intl.DateTimeFormat.supportedLocalesOf = origIntlDateTimeFormat.supportedLocalesOf;
+    } catch {}
+
+    // Spoof language settings
+    try {
+      Object.defineProperty(navigator, "language", {
+        get: () => FINGERPRINT_NOISE_CONFIG.language,
+        configurable: false
+      });
+      Object.defineProperty(navigator, "languages", {
+        get: () => [...FINGERPRINT_NOISE_CONFIG.languages],
+        configurable: false
+      });
+    } catch {}
+
     // Modern Network API Mocking
     if (navigator.connection) {
       try {
@@ -97,7 +175,7 @@ export class KrySecurityRouter {
     }
 
     // Shutdown High-Risk Tracking Subsystems (single pass)
-    const highRiskApis = ["geolocation", "mediaDevices", "bluetooth", "usb", "serial", "vibrate"];
+    const highRiskApis = ["geolocation", "mediaDevices", "bluetooth", "usb", "serial", "vibrate", "xr", "keyboard", "locks"];
     for (const api of highRiskApis) {
       if (api in navigator) {
         try { Object.defineProperty(navigator, api, { value: undefined, configurable: false, writable: false }); } catch {}
@@ -113,6 +191,24 @@ export class KrySecurityRouter {
         return Math.floor(value / perfRes) * perfRes;
       };
     }
+    
+    // Block AudioContext fingerprinting
+    if (globalThis.AudioContext?.prototype.createAnalyser) {
+      const origCreateAnalyser = globalThis.AudioContext.prototype.createAnalyser;
+      globalThis.AudioContext.prototype.createAnalyser = function() {
+        const analyser = origCreateAnalyser.call(this);
+        const origGetByteFrequencyData = analyser.getByteFrequencyData;
+        analyser.getByteFrequencyData = function(array) {
+          const result = origGetByteFrequencyData.call(this, array);
+          const noise = FINGERPRINT_NOISE_CONFIG.audioNoise;
+          for (let i = 0; i < array.length; i++) {
+            array[i] = Math.min(255, Math.max(0, array[i] + (Math.random() - 0.5) * noise * 255));
+          }
+          return result;
+        };
+        return analyser;
+      };
+    }
   }
 
   /**
@@ -120,39 +216,84 @@ export class KrySecurityRouter {
    */
   enforceRuntimePrivacySanitizer() {
     try {
+      // Clear storage mechanisms
       localStorage.clear();
       sessionStorage.clear();
       
+      // Clear all cookies with enhanced scope
       if (document.cookie) {
         const cookies = document.cookie.split(";");
+        const domains = [document.location.hostname, `.${document.location.hostname}`, "localhost"];
+        const paths = ["/", "/search", "/api"];
+        
         for (let i = 0; i < cookies.length; i++) {
           const cookie = cookies[i];
           const eqIdx = cookie.indexOf("=");
           const name = eqIdx > -1 ? cookie.substring(0, eqIdx).trim() : cookie.trim();
-          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+          
+          // Delete cookie across multiple domains and paths
+          for (const domain of domains) {
+            for (const path of paths) {
+              document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=${path};domain=${domain}`;
+              document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=${path};domain=${domain};secure;samesite=none`;
+            }
+          }
         }
       }
     } catch {}
 
-    // Optimized: Use event delegation for speculative link cleanup
+    // Block fingerprinting via Link prefetch/prerender/preconnect
     const clearSpeculativeLinks = () => {
-      const links = document.querySelectorAll('link[rel*="prefetch"], link[rel*="prerender"], link[rel*="preconnect"]');
+      const links = document.querySelectorAll('link[rel*="prefetch"], link[rel*="prerender"], link[rel*="preconnect"], link[rel="dns-prefetch"]');
       for (let i = 0; i < links.length; i++) {
         links[i].remove();
       }
     };
 
     clearSpeculativeLinks();
-    new MutationObserver(() => clearSpeculativeLinks()).observe(document.documentElement, {
+    
+    // Use MutationObserver with throttling to prevent excessive DOM operations
+    let observerTimeout = null;
+    const throttledObserver = () => {
+      if (!observerTimeout) {
+        observerTimeout = setTimeout(() => {
+          clearSpeculativeLinks();
+          observerTimeout = null;
+        }, 100);
+      }
+    };
+    
+    new MutationObserver(throttledObserver).observe(document.documentElement, {
       childList: true,
       subtree: true
     });
+    
+    // Block navigator.sendBeacon (used for tracking)
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon = function() { return false; };
+    }
+    
+    // Disable Resource Timing API (timing attacks)
+    if (performance.clearResourceTimings) {
+      performance.clearResourceTimings();
+    }
+    if (globalThis.PerformanceResourceTiming?.prototype) {
+      try {
+        Object.defineProperty(globalThis.PerformanceResourceTiming.prototype, 'responseStart', { get: () => 0 });
+        Object.defineProperty(globalThis.PerformanceResourceTiming.prototype, 'responseEnd', { get: () => 0 });
+        Object.defineProperty(globalThis.PerformanceResourceTiming.prototype, 'fetchStart', { get: () => 0 });
+      } catch {}
+    }
   }
 
   /**
    * Normalizes and cleans inbound tracking parameters with IDN protection
    */
   cleanTrackingParams(rawUrlString) {
+    if (!rawUrlString || typeof rawUrlString !== "string") {
+      return rawUrlString || "";
+    }
+    
     try {
       // 1. Un-escape and flatten string formatting variants first
       let preScrubbed = decode(rawUrlString).trim();
@@ -161,12 +302,22 @@ export class KrySecurityRouter {
       const urlObj = new URL(preScrubbed);
       urlObj.hostname = uts46.toAscii(urlObj.hostname, { UnicodeVersion: '15.1.0', transitional: false });
 
-      // 3. Robust parameter cleaning pass (optimized)
+      // 3. Robust parameter cleaning pass (optimized with Set lookups)
       const parsed = queryString.parseUrl(urlObj.toString());
       const queryKeys = Object.keys(parsed.query);
+      
       for (let i = 0; i < queryKeys.length; i++) {
         const key = queryKeys[i];
-        if (!ALLOWED_PARAMS.has(key) && !TRACKING_PARAMS.some(prefix => key.startsWith(prefix))) {
+        
+        // Fast path: check allowed params first (O(1))
+        if (ALLOWED_PARAMS.has(key)) continue;
+        
+        // Check tracking params (use some() for partial matching on prefixes)
+        const isTrackingParam = TRACKING_PARAMS.some(prefix => 
+          key === prefix || (prefix.endsWith('_') ? key.startsWith(prefix) : key.toLowerCase().includes(prefix.toLowerCase()))
+        );
+        
+        if (isTrackingParam) {
           delete parsed.query[key];
         }
       }
