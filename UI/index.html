@@ -46,6 +46,23 @@
       <button type="submit" class="w-full py-2 bg-red-600 text-white rounded-xl">Basic Search</button>
     </form>
   </noscript>
-  <script type="module" src="search.js"></script>
+  <!-- Only run search logic if we have a query parameter -->
+  <script type="module">
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
+    const directUrl = params.get("url");
+    
+    // Only execute search logic if we have search parameters
+    if (query || directUrl) {
+      // Import and run search logic
+      import('./search.js').catch(err => {
+        console.error("[KrySearch] Failed to load search module:", err);
+        // Fallback to Google
+        if (query) {
+          location.replace(`https://www.google.com/search?q=${encodeURIComponent(query)}`);
+        }
+      });
+    }
+  </script>
 </body>
 </html>
