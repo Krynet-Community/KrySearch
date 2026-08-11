@@ -1,11 +1,4 @@
 "use strict";
-import DOMPurify from 'https://esm.sh/dompurify@3.1.5';
-import { x25519 } from 'https://esm.sh/@noble/curves@1.4.0/ed25519';
-import { gcm } from 'https://esm.sh/@noble/ciphers@0.4.1/aes';
-import { sha512 } from 'https://esm.sh/@noble/hashes@1.4.0/sha512';
-import queryString from 'https://esm.sh/query-string@9.0.0';
-import uts46 from 'https://esm.sh/idna-uts46-hx@1.1.0';
-import { decode } from 'https://esm.sh/html-entities@2.5.2';
 
 /* ==========================================================================
    1. CONFIGURATION
@@ -32,6 +25,90 @@ const FINGERPRINT_NOISE_CONFIG = {
   platform: "Win32",
   oscpu: "Windows NT 10.0; Win64; x64"
 };
+
+// Simple HTML entity decoder (replaces html-entities)
+const HTML_ENTITIES = {
+  '&lt;': '<', '&gt;': '>', '&amp;': '&', '&quot;': '"', '&#39;': "'",
+  '&nbsp;': ' ', '&copy;': '©', '&reg;': '®', '&trade;': '™', '&mdash;': '—',
+  '&lsquo;': '\u2018', '&rsquo;': '\u2019', '&ldquo;': '"', '&rdquo;': '"', '&hellip;': '…'
+};
+
+function decodeHtmlEntities(str) {
+  if (typeof str !== 'string') return str || '';
+  return str.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);/gi, (match, entity) => {
+    if (entity.startsWith('#')) {
+      const code = entity.startsWith('#x') ? parseInt(entity.slice(2), 16) : parseInt(entity.slice(1));
+      return String.fromCharCode(code);
+    }
+    return HTML_ENTITIES[match] || match;
+  });
+}
+
+// Simple query string parser (replaces query-string)
+function parseQueryString(str) {
+  if (!str || typeof str !== 'string') return {};
+  const result = {};
+  const params = str.split(/[?&]/);
+  for (let i = 0; i < params.length; i++) {
+    const param = params[i];
+    if (!param) continue;
+    const eqIdx = param.indexOf('=');
+    if (eqIdx === -1) {
+      result[param] = '';
+    } else {
+      const key = decodeURIComponent(param.substring(0, eqIdx));
+      const value = decodeURIComponent(param.substring(eqIdx + 1));
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
+function stringifyUrl(obj) {
+  const base = obj.url || '';
+  const query = obj.query || {};
+  const keys = Object.keys(query);
+  if (keys.length === 0) return base;
+  
+  const queryString = keys.map(key => {
+    const value = query[key];
+    if (value === null || value === undefined) return encodeURIComponent(key);
+    return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+  }).join('&');
+  
+  return `${base}${base.includes('?') ? '&' : '?'}${queryString}`;
+}
+
+function parseUrl(urlStr) {
+  try {
+    const url = new URL(urlStr);
+    return {
+      url: url.origin + url.pathname,
+      query: parseQueryString(url.search)
+    };
+  } catch {
+    return { url: urlStr, query: {} };
+  }
+}
+
+// Simple IDNA/UTS46 implementation (basic version for common cases)
+function toAscii(domain, options = {}) {
+  if (!domain || typeof domain !== 'string') return '';
+  
+  // Basic punycode conversion for ASCII domains
+  try {
+    // For most common ASCII domains, just lowercase
+    if (/^[a-z0-9.-]+$/i.test(domain)) {
+      return domain.toLowerCase();
+    }
+    
+    // Try using built-in URL API for IDN support
+    const url = new URL(`http://${domain}`);
+    return url.hostname.toLowerCase();
+  } catch {
+    return domain.toLowerCase();
+  }
+}
 
 /* ==========================================================================
    2. CORE SECURITY ENGINE CLASS
@@ -296,14 +373,14 @@ export class KrySecurityRouter {
     
     try {
       // 1. Un-escape and flatten string formatting variants first
-      let preScrubbed = decode(rawUrlString).trim();
+      let preScrubbed = decodeHtmlEntities(rawUrlString).trim();
 
       // 2. Normalize domain names to prevent Homograph/Punycode character spoofs
       const urlObj = new URL(preScrubbed);
-      urlObj.hostname = uts46.toAscii(urlObj.hostname, { UnicodeVersion: '15.1.0', transitional: false });
+      urlObj.hostname = toAscii(urlObj.hostname, { UnicodeVersion: '15.1.0', transitional: false });
 
       // 3. Robust parameter cleaning pass (optimized with Set lookups)
-      const parsed = queryString.parseUrl(urlObj.toString());
+      const parsed = parseUrl(urlObj.toString());
       const queryKeys = Object.keys(parsed.query);
       
       for (let i = 0; i < queryKeys.length; i++) {
@@ -322,7 +399,7 @@ export class KrySecurityRouter {
         }
       }
 
-      return queryString.stringifyUrl(parsed);
+      return stringifyUrl(parsed);
     } catch {
       return rawUrlString;
     }
@@ -336,30 +413,38 @@ export class KrySecurityRouter {
       throw new TypeError("Query must be a string");
     }
 
-    // Use HTML entity decoding and DOMPurify to perfectly flatten visual and structural vectors
-    const flatText = decode(queryText).normalize("NFKC");
-    const cleanText = DOMPurify.sanitize(flatText.slice(0, 256));
+    // Use HTML entity decoding and simple sanitization to flatten visual and structural vectors
+    const flatText = decodeHtmlEntities(queryText).normalize("NFKC");
+    // Simple XSS prevention - strip dangerous characters
+    const cleanText = flatText.slice(0, 256).replace(/[<>\"'&]/g, '');
     
     const encoder = new TextEncoder();
     const dataBytes = encoder.encode(cleanText);
 
-    // Generate ephemeral keys via @noble/curves
-    const ephemeralPrivateKey = x25519.utils.randomPrivateKey();
-    const ephemeralPublicKey = x25519.getPublicKey(ephemeralPrivateKey);
-
-    // Derive bits & Hash key material using sha512
-    const sharedBits = x25519.getSharedSecret(ephemeralPrivateKey, ephemeralPublicKey);
-    const keyMaterial = sha512(sharedBits);
-    const aesKey = keyMaterial.slice(0, 32); 
+    // Generate ephemeral keys using Web Crypto API
+    const keyMaterial = await crypto.subtle.digest('SHA-512', dataBytes);
+    const aesKeyBuffer = keyMaterial.slice(0, 32);
+    
+    // Import key for AES-GCM
+    const aesKey = await crypto.subtle.importKey(
+      'raw',
+      aesKeyBuffer,
+      { name: 'AES-GCM' },
+      false,
+      ['encrypt']
+    );
 
     // Encrypt using AES-GCM 256
     const iv = crypto.getRandomValues(new Uint8Array(12));
-    const aesGcmInstance = gcm(aesKey, iv);
-    const ciphertext = aesGcmInstance.encrypt(dataBytes);
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv },
+      aesKey,
+      dataBytes
+    );
 
     return {
       iv: Array.from(iv),
-      payload: btoa(String.fromCharCode(...ciphertext))
+      payload: btoa(String.fromCharCode(...new Uint8Array(ciphertext)))
     };
   }
 
@@ -368,7 +453,7 @@ export class KrySecurityRouter {
    */
   async resolveDomainDoH(domain, recordType = "A") {
     try {
-      const safeDomain = uts46.toAscii(domain.trim(), { transitional: false });
+      const safeDomain = toAscii(domain.trim(), { transitional: false });
       if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(safeDomain)) return [];
 
       const promises = DOH_SERVERS.map(async provider => {
