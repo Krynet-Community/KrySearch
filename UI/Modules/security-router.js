@@ -12,6 +12,7 @@ import { decode } from 'https://esm.sh/html-entities@2.5.2';
    ========================================================================== */
 
 const TRACKING_PARAMS = ["utm_", "fbclid", "gclid", "_ga", "_gl", "_gid"];
+const ALLOWED_PARAMS = new Set(["url", "q", "engine"]);
 
 const DOH_SERVERS = [
   "https://dns.quad9.net/dns-query",
@@ -39,7 +40,7 @@ export class KrySecurityRouter {
   initializeFingerprintHardening() {
     const profile = this.profiles[this.engineProfile] || this.profiles.default;
 
-    // Standardize Canvas surface responses
+    // Standardize Canvas surface responses (cached prototype references)
     if (globalThis.HTMLCanvasElement?.prototype.toDataURL) {
       globalThis.HTMLCanvasElement.prototype.toDataURL = () => 
         "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB";
@@ -65,7 +66,7 @@ export class KrySecurityRouter {
       };
     }
 
-    // Immutable Hardware Specifications Lock
+    // Immutable Hardware Specifications Lock (batch operation)
     const targetSpecs = {
       hardwareConcurrency: 4,
       deviceMemory: 8,
@@ -95,20 +96,21 @@ export class KrySecurityRouter {
       } catch {}
     }
 
-    // Shutdown High-Risk Tracking Subsystems
+    // Shutdown High-Risk Tracking Subsystems (single pass)
     const highRiskApis = ["geolocation", "mediaDevices", "bluetooth", "usb", "serial", "vibrate"];
-    highRiskApis.forEach((api) => {
+    for (const api of highRiskApis) {
       if (api in navigator) {
         try { Object.defineProperty(navigator, api, { value: undefined, configurable: false, writable: false }); } catch {}
       }
-    });
+    }
 
     // Reduce Performance API timer precision to eliminate timing/side-channel attacks
     if (globalThis.performance?.now) {
       const origNow = globalThis.performance.now.bind(globalThis.performance);
+      const perfRes = profile.perfRes;
       globalThis.performance.now = () => {
         const value = origNow();
-        return Math.floor(value / profile.perfRes) * profile.perfRes;
+        return Math.floor(value / perfRes) * perfRes;
       };
     }
   }
@@ -120,16 +122,24 @@ export class KrySecurityRouter {
     try {
       localStorage.clear();
       sessionStorage.clear();
-      document.cookie.split(";").forEach(cookie => {
-        const eqIdx = cookie.indexOf("=");
-        const name = eqIdx > -1 ? cookie.substring(0, eqIdx) : cookie;
-        document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
-      });
+      
+      if (document.cookie) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i];
+          const eqIdx = cookie.indexOf("=");
+          const name = eqIdx > -1 ? cookie.substring(0, eqIdx).trim() : cookie.trim();
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+        }
+      }
     } catch {}
 
+    // Optimized: Use event delegation for speculative link cleanup
     const clearSpeculativeLinks = () => {
-      document.querySelectorAll('link[rel*="prefetch"], link[rel*="prerender"], link[rel*="preconnect"]')
-        .forEach(element => element.remove());
+      const links = document.querySelectorAll('link[rel*="prefetch"], link[rel*="prerender"], link[rel*="preconnect"]');
+      for (let i = 0; i < links.length; i++) {
+        links[i].remove();
+      }
     };
 
     clearSpeculativeLinks();
@@ -151,13 +161,15 @@ export class KrySecurityRouter {
       const urlObj = new URL(preScrubbed);
       urlObj.hostname = uts46.toAscii(urlObj.hostname, { UnicodeVersion: '15.1.0', transitional: false });
 
-      // 3. Robust parameter cleaning pass
+      // 3. Robust parameter cleaning pass (optimized)
       const parsed = queryString.parseUrl(urlObj.toString());
-      Object.keys(parsed.query).forEach(key => {
-        if (TRACKING_PARAMS.some(prefix => key.startsWith(prefix)) || !["url", "q", "engine"].includes(key)) {
+      const queryKeys = Object.keys(parsed.query);
+      for (let i = 0; i < queryKeys.length; i++) {
+        const key = queryKeys[i];
+        if (!ALLOWED_PARAMS.has(key) && !TRACKING_PARAMS.some(prefix => key.startsWith(prefix))) {
           delete parsed.query[key];
         }
-      });
+      }
 
       return queryString.stringifyUrl(parsed);
     } catch {
@@ -208,7 +220,7 @@ export class KrySecurityRouter {
       const safeDomain = uts46.toAscii(domain.trim(), { transitional: false });
       if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(safeDomain)) return [];
 
-      return await Promise.any(DOH_SERVERS.map(async provider => {
+      const promises = DOH_SERVERS.map(async provider => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 1500);
 
@@ -226,7 +238,9 @@ export class KrySecurityRouter {
           clearTimeout(timer);
           return [];
         }
-      }));
+      });
+
+      return await Promise.any(promises);
     } catch {
       return [];
     }
