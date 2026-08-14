@@ -1,44 +1,75 @@
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,35:1E3A8A,70:2563EB,100:38BDF8&height=200&section=header&text=KrySearch&fontSize=42&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Community-maintained%20Krynet%20continuation&descAlignY=58" />
-</p>
-
-<h1 align="center">🔍 KrySearch 🇮🇸</h1>
+# 🔍 KrySearch 🇮🇸
 
 <p align="center">
-  Community-maintained continuation of the original <strong>KrySearch</strong> project created by <strong>Krynet, LLC</strong>.
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,35:1E3A8A,70:2563EB,100:38BDF8&height=220&section=header&text=KrySearch&fontSize=46&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Independent%20Community%20Continuation&descAlignY=58" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/License-GPL--3.0-blue">
-  <img src="https://img.shields.io/badge/LibreJS-Compatible-success">
-  <img src="https://img.shields.io/badge/Language-JavaScript-F7DF1E">
-  <img src="https://img.shields.io/badge/Status-Community%20Maintained-success">
-  <img src="https://img.shields.io/badge/Origin-Krynet%2C%20LLC-2563EB">
+  <strong>🔎 Search • 🛡️ Privacy • 🔓 Open Source • 🌍 Community</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg">
+  <img src="https://img.shields.io/badge/LibreJS-Compatible-success.svg">
+  <img src="https://img.shields.io/badge/Language-JavaScript-F7DF1E.svg">
+  <img src="https://img.shields.io/badge/Status-Community%20Maintained-success.svg">
+  <img src="https://img.shields.io/badge/Origin-Krynet%2C%20LLC-2563EB.svg">
 </p>
 
 > [!NOTE]
-> **KrySearch was originally created by Krynet, LLC as a privacy-first search routing project.**
+> **KrySearch was originally created by Krynet, LLC.**
 >
-> This repository is a **community-maintained fork and continuation** of the original KrySearch project. It is independently maintained and is **not an official Krynet, LLC repository**.
+> This repository is an **independent community-maintained fork and continuation** of the original KrySearch project.
+>
+> It is **not an official Krynet, LLC repository, product, partner project, or UGC Program project.**
+
+---
+
+## ⚠️ Important
+
+The original KrySearch project was created by **Krynet, LLC**.
+
+This repository is maintained independently by **Krynet Community** and may differ from the original project in implementation, security practices, quality standards, features, dependencies, and development direction.
+
+Nothing in this repository should be interpreted as:
+
+* ❌ Official Krynet software
+* ❌ An official Krynet release
+* ❌ Official Krynet documentation
+* ❌ An official Krynet API
+* ❌ An official Krynet security recommendation
+* ❌ A Krynet partnership
+* ❌ Krynet, LLC endorsement
+* ❌ Official Krynet UGC Program participation
+* ❌ An official Krynet Store listing
+
+> [!CAUTION]
+>
+> ### 🔐 Different Security & Quality Practices
+>
+> **Krynet Community does not follow the same security practices or quality practices as the official Krynet Team.**
+>
+> Community-maintained changes may not receive the same review, testing, auditing, release validation, or security processes used by Krynet, LLC.
+>
+> Review source code and changes before deploying KrySearch, particularly when operating your own instance or integrating it into another application.
 
 ---
 
 ## 📖 About
 
-**KrySearch** is a privacy-focused, open-source search router designed to give users greater control over how search requests are processed.
+**KrySearch** is a privacy-focused, open-source search router originally created by **Krynet, LLC**.
 
-The original project was created by **Krynet, LLC** with an emphasis on privacy, free software, alternative search engines, and reducing unnecessary tracking.
+This community continuation exists to preserve and continue development of the project while allowing independent contributors to maintain, improve, harden, and extend the software.
 
-This community continuation builds upon that foundation while allowing contributors to maintain, improve, harden, and extend the project independently.
+The project focuses on:
 
-The project aims to remain:
-
-* 🛡️ Privacy-focused
-* 🔓 Free and open source
-* 🌍 Self-hostable
-* 🧱 Lightweight
-* ⚡ Dependency-conscious
-* 🤝 Community maintained
+* 🛡️ Privacy-oriented search routing
+* 🔓 Free and open-source software
+* 🌍 Self-hosting
+* 🧱 Lightweight architecture
+* ⚡ Minimal dependencies
+* 🤝 Community development
+* 🧹 Tracking and telemetry reduction
 
 ---
 
@@ -46,64 +77,75 @@ The project aims to remain:
 
 ### 🔍 Privacy-Focused Search Routing
 
-* Route searches through configurable search engines
-* Support multiple backend engines
-* Clean search parameters before routing
-* Support direct URL routing
-* Configurable engine mappings
-* Runtime-only request processing
+KrySearch can provide configurable search routing through supported search engines.
+
+Features include:
+
+* 🔎 Configurable search engines
+* 🔀 Search-engine routing
+* 🧹 Query normalization
+* 🔗 Direct URL routing
+* ⚙️ Configurable engine mappings
+* 🧩 Runtime-only request processing
+
+---
 
 ### 🛡️ Browser Privacy Protection
 
-The project includes an extensive client-side privacy layer.
+The client-side privacy layer provides protections against several common browser tracking and fingerprinting techniques.
 
 Current functionality includes:
 
-* Canvas fingerprint noise injection
-* WebGL vendor and renderer spoofing
-* Timezone normalization
-* Language and locale normalization
-* AudioContext fingerprint protection
-* Hardware concurrency masking
-* Tracking-parameter filtering
-* Cookie-clearing mechanisms
-* Resource Timing API protection
-* `navigator.sendBeacon` blocking
-* Dynamic tracking-link removal
-* MutationObserver-based telemetry cleanup
+* 🎨 Canvas fingerprint noise injection
+* 🖥️ WebGL vendor and renderer spoofing
+* 🌍 Timezone normalization
+* 🗣️ Language and locale normalization
+* 🎧 AudioContext fingerprint protection
+* 🧠 Hardware-concurrency masking
+* 🧹 Tracking-parameter filtering
+* 🍪 Cookie-clearing mechanisms
+* ⏱️ Resource Timing API protection
+* 🚫 `navigator.sendBeacon` blocking
+* 🔗 Dynamic tracking-link removal
+* 👁️ MutationObserver-based telemetry cleanup
 
-The goal is to reduce passive browser fingerprinting and unnecessary telemetry while keeping the implementation understandable and self-hostable.
+> [!NOTE]
+> These mechanisms are intended to **reduce certain tracking and fingerprinting surfaces**. They do not provide complete anonymity.
+
+---
 
 ### 🧼 Telemetry Sanitization
 
-KrySearch actively works to remove common tracking mechanisms.
+KrySearch can remove common tracking mechanisms before requests are processed.
 
 The privacy layer can:
 
-* Strip common tracking parameters
-* Remove `utm_*` parameters
-* Remove identifiers such as `fbclid` and `gclid`
-* Detect dynamically inserted tracking links
-* Prevent speculative resource timing exposure
-* Disable Beacon-based telemetry
-* Clear cookies across configured domains and paths
+* 🧹 Strip common tracking parameters
+* 🚫 Remove `utm_*` parameters
+* 🚫 Remove identifiers such as `fbclid` and `gclid`
+* 🔗 Detect dynamically inserted tracking links
+* ⏱️ Restrict Resource Timing exposure
+* 📡 Disable Beacon-based telemetry
+* 🍪 Clear configured cookies
 
-### 🔑 Zero-Dependency Architecture
+---
 
-The community continuation emphasizes browser-native functionality wherever practical.
+### 🔑 Minimal-Dependency Architecture
 
-Security and cryptographic functionality can use native Web APIs rather than external libraries.
+The community continuation favors browser-native APIs wherever practical.
 
 This includes:
 
-* Native Web Crypto API
-* AES-GCM encryption
-* ECDH key exchange
-* Native URL processing
-* Native HTML handling
-* Native browser APIs
+* 🔐 Web Crypto API
+* 🔒 AES-GCM
+* 🔑 ECDH
+* 🔗 Native URL APIs
+* 🧱 Native DOM APIs
+* 🌐 Native browser networking APIs
 
-The architecture is designed to minimize dependency and CDN requirements.
+The goal is to keep the client lightweight and reduce unnecessary third-party dependencies and CDN requirements.
+
+---
 
 ### 🟢 LibreJS Compatibility
 
@@ -111,80 +153,80 @@ KrySearch is designed with LibreJS compatibility in mind.
 
 The project favors:
 
-* Locally hosted JavaScript
-* Explicit script assets
-* Minimal third-party dependencies
-* Self-contained browser functionality
-* Transparent source code
+* 📦 Locally hosted JavaScript
+* 📜 Explicit script assets
+* 🧩 Minimal third-party dependencies
+* 🧱 Self-contained browser functionality
+* 🔍 Transparent source code
+
+---
 
 ### ⚡ Performance
 
-Privacy protections are implemented with performance in mind.
+Privacy functionality is implemented with performance in mind.
 
 Current optimizations include:
 
-* Deferred security initialization
-* Set-based tracking-parameter lookups
-* Cached property access
-* Lazy/eager image-loading optimization
-* Removal of unnecessary DNS prefetching
-* Reduced external dependency overhead
+* ⏳ Deferred security initialization
+* ⚡ Efficient tracking-parameter lookups
+* 💾 Cached property access
+* 🖼️ Image-loading optimization
+* 🚫 Reduced unnecessary DNS prefetching
+* 📦 Reduced external dependency overhead
 
 ---
 
 ## 🔧 How It Works
 
-KrySearch operates as a client-side search routing and privacy layer.
+KrySearch operates primarily as a **client-side search routing and privacy layer**.
 
 ```text
-User
- │
- ▼
-index.html
- │
- │ Search query / URL
- ▼
-search.html
- │
- ├── Input normalization
- │
- ├── Tracking cleanup
- │
- ├── Browser privacy protections
- │
- ├── Fingerprint protection
- │
- └── Search engine selection
- │
- ▼
-Configured Search Engine
+                 👤 User
+                   │
+                   ▼
+              🏠 index.html
+                   │
+                   │ Search / URL
+                   ▼
+              🔎 search.html
+                   │
+        ┌──────────┼──────────┐
+        │          │          │
+        ▼          ▼          ▼
+     🧹 Clean    🛡️ Privacy  🔍 Engine
+     Request     Protection  Selection
+        │          │          │
+        └──────────┼──────────┘
+                   │
+                   ▼
+          🌐 Configured Engine
 ```
 
-### Processing Flow
+### 🔄 Processing Flow
 
-1. **User Input**
+1. **👤 User Input**
 
-   * A search query or URL is entered through the interface.
+   * A search query or URL is entered.
 
-2. **Input Normalization**
+2. **🧹 Input Normalization**
 
-   * The request is parsed and normalized before routing.
+   * The request is parsed and normalized.
 
-3. **Privacy Layer**
+3. **🛡️ Privacy Layer**
 
-   * Tracking parameters and telemetry mechanisms are handled before the request proceeds.
+   * Tracking parameters and telemetry mechanisms are handled.
 
-4. **Browser Protection**
+4. **🔐 Browser Protection**
 
-   * Fingerprinting surfaces such as Canvas, WebGL, AudioContext, timezone, and hardware concurrency are normalized or protected.
+   * Supported fingerprinting surfaces are normalized or protected.
 
-5. **Engine Selection**
+5. **🔍 Engine Selection**
 
-   * The configured search engine is selected according to the routing configuration.
+   * The configured search engine is selected.
 
-6. **Request Routing**
+6. **🌐 Request Routing**
 
-   * The cleaned request is forwarded to the selected engine.
+   * The processed request is routed to the selected engine.
 
 ---
 
@@ -212,24 +254,25 @@ Example:
 }
 ```
 
-This allows self-hosters and contributors to add or modify supported search providers without changing the core routing logic.
+This allows self-hosters and contributors to modify supported search providers without changing the core routing implementation.
 
 ---
 
 ## 🚀 Installation & Deployment
 
-### Prerequisites
+### 📋 Prerequisites
 
 A modern browser supporting:
 
-* ES Modules
-* Web Crypto API
-* Standard Fetch APIs
-* Modern DOM APIs
+* 📦 ES Modules
+* 🔐 Web Crypto API
+* 🌐 Fetch APIs
+* 🧱 Modern DOM APIs
+* 🔗 Standard URL APIs
 
-A standard static web server can be used for local deployment.
+A standard static web server is sufficient for deployment.
 
-### Local Development
+### 📥 Local Development
 
 ```bash
 git clone https://github.com/YourName/KrySearch.git
@@ -238,37 +281,39 @@ cd KrySearch/UI
 python3 -m http.server 8080
 ```
 
-Alternatively, use any standard static web server capable of serving JavaScript modules correctly.
-
 Then open:
 
 ```text
 http://localhost:8080
 ```
 
+Any static web server capable of correctly serving JavaScript modules can be used.
+
 > [!IMPORTANT]
-> GitHub Pages and other static hosting providers must serve JavaScript files with the correct MIME type. If a module is returned as `text/html`, the browser will reject it.
+> JavaScript modules must be served with the correct MIME type.
+>
+> If a `.js` module is returned as `text/html`, browsers such as Firefox will reject it.
 
 ---
 
 ## 📝 Usage
 
-| Action              | Description                                                     |
-| ------------------- | --------------------------------------------------------------- |
-| 🔍 Search           | Enter a query and route it through the configured search engine |
-| 🌐 URL Routing      | Process a direct URL through the routing layer                  |
-| ⚙️ Engine Selection | Select or override the configured search engine                 |
-| 🛡️ Privacy Mode    | Apply the browser privacy and telemetry protections             |
+| Action                  | Description                                                     |
+| ----------------------- | --------------------------------------------------------------- |
+| 🔍 **Search**           | Enter a query and route it through the configured search engine |
+| 🌐 **URL Routing**      | Process a direct URL through the routing layer                  |
+| ⚙️ **Engine Selection** | Select or override the configured search engine                 |
+| 🛡️ **Privacy Mode**    | Apply browser privacy and telemetry protections                 |
 
-### Query Parameters
+### 🔗 Query Parameters
 
-| Parameter          | Description                           |
-| ------------------ | ------------------------------------- |
-| `?q=<query>`       | Search query                          |
-| `?url=<url>`       | Direct URL routing                    |
-| `?engine=<engine>` | Override the configured search engine |
+| Parameter          | Description                   |
+| ------------------ | ----------------------------- |
+| `?q=<query>`       | 🔍 Search query               |
+| `?url=<url>`       | 🌐 Direct URL routing         |
+| `?engine=<engine>` | ⚙️ Override configured engine |
 
-### Examples
+### 💡 Examples
 
 ```text
 https://krysearch.io/?q=privacy+sovereignty
@@ -286,58 +331,63 @@ https://yourusername.github.io/KrySearch/search.html?q=test
 
 ## 🛡️ Privacy
 
-KrySearch is designed around minimizing unnecessary data collection and browser telemetry.
+KrySearch is designed around minimizing unnecessary browser telemetry and application-level data collection.
 
-### Client-Side Protections
+### 🔒 Client-Side Protections
 
-The privacy layer includes protections for:
+The privacy layer includes mechanisms for:
 
-* Canvas fingerprinting
-* WebGL fingerprinting
-* AudioContext fingerprinting
-* Hardware-concurrency fingerprinting
-* Timezone fingerprinting
-* Language/locale fingerprinting
-* Tracking URL parameters
-* Resource Timing
-* Beacon telemetry
-* Dynamically inserted tracking links
-* Cookie persistence
+* 🎨 Canvas fingerprinting
+* 🖥️ WebGL fingerprinting
+* 🎧 AudioContext fingerprinting
+* 🧠 Hardware-concurrency fingerprinting
+* 🌍 Timezone fingerprinting
+* 🗣️ Language and locale fingerprinting
+* 🔗 Tracking URL parameters
+* ⏱️ Resource Timing
+* 📡 Beacon telemetry
+* 🧹 Dynamically inserted tracking links
+* 🍪 Cookie persistence
 
-### No Application Tracking Database
+### 💾 No Required Application Tracking Database
 
-The project does not require a centralized query-history database for its core routing functionality.
+Core routing functionality does not require a centralized query-history database.
 
-Search processing is intended to happen at runtime rather than through a persistent application-level search history system.
+Search processing is intended to occur at runtime rather than through a persistent application-level search-history system.
 
-> [!NOTE]
-> Browser privacy protections are not equivalent to anonymity. Search engines, hosting providers, networks, browsers, extensions, and other infrastructure can still have their own logging and tracking policies.
+> [!WARNING]
+> **Privacy protection is not anonymity.**
+>
+> Search engines, hosting providers, ISPs, networks, browsers, extensions, operating systems, and other infrastructure may maintain their own logs or telemetry.
+>
+> KrySearch cannot control the privacy practices of external services that users choose to access.
 
 ---
 
-## 🧩 Project Structure
+## 📁 Project Structure
 
 ```text
 UI/
-├── index.html
-├── search.html
-├── security-router.js
-├── lgoo.png
-└── Config/
+├── 🏠 index.html
+├── 🔎 search.html
+├── 🛡️ security-router.js
+├── 🖼️ lgoo.png
+│
+└── ⚙️ Config/
     └── config.json
 ```
 
-### Core Components
+### 🧩 Core Components
 
-| Component            | Purpose                                        |
-| -------------------- | ---------------------------------------------- |
-| `index.html`         | Main search interface                          |
-| `search.html`        | Search processing interface                    |
-| `security-router.js` | Privacy, telemetry, and fingerprint protection |
-| `Config/config.json` | Search engine configuration                    |
-| `lgoo.png`           | Project branding                               |
+| Component            | Purpose                                            |
+| -------------------- | -------------------------------------------------- |
+| `index.html`         | 🏠 Main search interface                           |
+| `search.html`        | 🔎 Search processing interface                     |
+| `security-router.js` | 🛡️ Privacy, telemetry, and fingerprint protection |
+| `Config/config.json` | ⚙️ Search-engine configuration                     |
+| `lgoo.png`           | 🎨 Project branding                                |
 
-If additional local modules are introduced, keep their imports explicit and document their purpose within the project structure.
+If additional modules are introduced, keep imports explicit and document their purpose.
 
 ---
 
@@ -349,14 +399,16 @@ Community development may include:
 * 🛡️ Stronger browser privacy protections
 * 🧹 Expanded telemetry filtering
 * ⚡ Performance improvements
-* 🌐 Improved routing capabilities
+* 🌐 Improved routing
 * 🔐 Additional cryptographic functionality
 * ♿ Accessibility improvements
 * 📱 Mobile UI improvements
 * 🧪 Automated testing
-* 📚 Better documentation
-* 🐞 Compatibility fixes
+* 📚 Documentation improvements
+* 🐛 Compatibility fixes
 * 🤝 Contributor tooling
+
+Roadmap items are **community goals**, not commitments from Krynet, LLC.
 
 ---
 
@@ -366,16 +418,17 @@ KrySearch is maintained as a community continuation of the original project.
 
 Contributions are welcome.
 
-### Development Workflow
+### 🔄 Development Workflow
 
-1. Fork the repository.
-2. Clone your fork.
-3. Create a focused feature branch.
-4. Implement and test your changes.
-5. Verify browser-console behavior.
-6. Commit your changes.
-7. Push the branch.
-8. Open a pull request.
+1. 🍴 Fork the repository.
+2. 📥 Clone your fork.
+3. 🌿 Create a focused branch.
+4. 🛠️ Implement your changes.
+5. 🧪 Test the changes.
+6. 🔍 Check browser-console behavior.
+7. 💾 Commit your changes.
+8. 🚀 Push the branch.
+9. 🔀 Open a pull request.
 
 Example:
 
@@ -390,40 +443,72 @@ git commit -m "Improve privacy routing"
 git push origin feature/privacy-improvement
 ```
 
-Keep changes focused, readable, and compatible with the project's lightweight architecture.
+Keep contributions:
+
+* 📖 Readable
+* 🧩 Focused
+* 📝 Documented
+* 🔍 Reviewable
+* ⚡ Lightweight
+* 🤝 Compatible with the existing architecture
 
 ---
 
-## 🏢 About the Original Krynet Project
+## 🏛️ Original Project
 
 The original **KrySearch** project was created by **Krynet, LLC**.
 
-Official Krynet resources:
+### 🔗 Official Krynet Resources
 
-* 🌐 https://krynet.ai
-* 📦 https://codeberg.org/Krynet-LLC
-* 💻 https://gitlab.com/Krynet-Team
+* 🌐 [https://krynet.ai](https://krynet.ai)
+* 📦 [https://codeberg.org/Krynet-LLC](https://codeberg.org/Krynet-LLC)
+* 💻 [https://gitlab.com/Krynet-Team](https://gitlab.com/Krynet-Team)
 
-KrySearch's original project and branding belong to their respective owners.
+The original project's code, trademarks, branding, and other applicable rights remain subject to their respective owners and licenses.
 
-This repository is a **community-maintained fork/continuation** and should not be interpreted as an official Krynet, LLC project.
+This repository is an **independent community fork and continuation**.
 
 ---
 
-## 🇮🇸 Krynet Community
+## 🧩 Krynet Community
 
-This project is part of a broader community effort to preserve, maintain, and extend open-source software originating from the Krynet ecosystem.
+KrySearch is part of a broader community effort around software originating from or related to the Krynet ecosystem.
 
-The community approach focuses on:
+The community focuses on:
 
-* 🔓 Keeping source code available
-* 🛠️ Continuing abandoned or inactive components
-* 🧑‍💻 Encouraging independent contributors
+* 🔓 Preserving available source code
+* 🛠️ Continuing inactive or abandoned components
+* 🧑‍💻 Supporting independent contributors
 * 🌍 Supporting self-hosted deployments
-* 🛡️ Preserving privacy-oriented functionality
-* 📚 Maintaining clear technical documentation
+* 🛡️ Maintaining privacy-oriented functionality
+* 📚 Preserving technical documentation
+* 🔬 Experimenting with alternative implementations
 
-The goal is not to impersonate the original organization, but to **keep useful open-source work alive and make continued development possible**.
+The goal is **not to impersonate Krynet, LLC**, but to provide an independent place where community members can continue working on related open-source software.
+
+---
+
+## ⚠️ Community Status
+
+> [!CAUTION]
+> KrySearch is **community-maintained software**.
+>
+> It is not maintained, reviewed, audited, or supported by the official Krynet Team.
+
+Krynet Community does **not follow the same security or quality practices as Krynet, LLC**.
+
+Do not assume that functionality, security behavior, compatibility, or implementation quality is equivalent to an official Krynet product.
+
+---
+
+## 🏪 UGC Program & Partnership Status
+
+> [!IMPORTANT]
+> KrySearch is **not an official Krynet UGC Program project** and Krynet Community is **not a Krynet, LLC partner**.
+>
+> Nothing in this repository should be interpreted as participation in, approval under, or acceptance into Krynet's official creator or UGC programs.
+
+Official Krynet UGC opportunities, creator programs, Store policies, and related information should be obtained directly from **Krynet, LLC**.
 
 ---
 
@@ -431,12 +516,18 @@ The goal is not to impersonate the original organization, but to **keep useful o
 
 KrySearch is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
 
-See the official GNU license text for the complete terms.
+See [`LICENSE`](LICENSE) for the complete license terms.
 
 ---
 
 <p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,35:1E3A8A,70:2563EB,100:38BDF8&height=120&section=footer" />
+</p>
 
-❤️ Preserving privacy-focused open-source software through community development.
+<p align="center">
+  🔍 <strong>KrySearch</strong> · 🛡️ Privacy · 🔓 Open Source · 🤝 Community Maintained
+</p>
 
+<p align="center">
+  <strong>Not Official Krynet Software · Not a Krynet Partner · Not Part of the Krynet UGC Program</strong>
 </p>
